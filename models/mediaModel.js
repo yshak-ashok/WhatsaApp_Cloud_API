@@ -2,19 +2,15 @@ const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
 require('dotenv').config();
-
-const accessToken = process.env.ACCESS_TOKEN;
-const phoneNumberId = process.env.PHONE_NUMBER_ID;
-
 async function uploadMedia(filePath) {
     try {
         const fileStream = fs.createReadStream(filePath);
         const form = new FormData();
-        form.append('file', fileStream, { filename: 'file', contentType: 'image/png' });
-        form.append('type', 'image');
+        form.append('file', fileStream, { filename: 'file.pdf', contentType: 'application/pdf' });
+        form.append('type', 'document');
         form.append('messaging_product', 'whatsapp');
-        form.append('access_token', accessToken);
-        const response = await axios.post(`https://graph.facebook.com/v17.0/${phoneNumberId}/media`, form, {
+        form.append('access_token', process.env.ACCESS_TOKEN);
+        const response = await axios.post(`https://graph.facebook.com/v17.0/${process.env.PHONE_NUMBER_ID}/media`, form, {
             headers: { ...form.getHeaders() },
         });
 
@@ -29,15 +25,15 @@ async function sendMessage(to, mediaId) {
         const message = {
             messaging_product: 'whatsapp',
             to: to,
-            type: 'image',
-            image: {
+            type: 'document',
+            document: {
                 id: mediaId,
             },
         };
         console.log('message',message);
-        const response = await axios.post(`https://graph.facebook.com/v17.0/${phoneNumberId}/messages`, message, {
+        const response = await axios.post(`https://graph.facebook.com/v17.0/${process.env.PHONE_NUMBER_ID}/messages`, message, {
             headers: {
-                Authorization: `Bearer ${accessToken}`,
+                Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
                 'Content-Type': 'application/json',
             },
         });
